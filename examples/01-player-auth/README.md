@@ -1,75 +1,66 @@
 # 01 — Player authentication and private profiles
 
-This pattern separates identity from game state and makes privacy rules explicit before the client is built. It is a configuration recipe, not a drop-in migration: confirm rule syntax and collection field types against the exact PocketBase release pinned by your deployment.
-
-## Threat model
-
-Assume every browser request can be modified by a player. A client-supplied player ID, kit ID, score, purchase state, or role is not proof of authorization. Use PocketBase's authenticated request context and server-controlled records to decide access.
+This recipe separates identity from game state and makes privacy rules explicit before the client is built. The API tests exercise a running PocketBase instance using two **disposable synthetic players**. They are intentionally opt-in and do not run in generic CI because they require a provisioned instance and credentials.
 
 ## Suggested data model
 
-### Built-in auth collection: `players`
+Use a dedicated auth collection named `players` and a base collection named `player_profiles`.
 
-Use a dedicated auth collection for player accounts. Keep administrator accounts separate from ordinary player accounts; do not promote a player by accepting a client-submitted role field.
+Suggested profile fields:
 
-- Allow only the registration and authentication flows the game actually needs.
-- Disable public listing of player records.
-- Keep email visibility and verification requirements intentional.
-- Do not put purchase entitlements, organizer privileges, or trusted score totals in client-editable player fields.
-- Configure password reset, verification, and rate limits for the pinned PocketBase version.
-
-### Base collection: `player_profiles`
-
-Suggested fields:
-
-- `owner`: required relation to one `players` record; not user-editable after creation.
-- `display_name`: bounded public-facing label; do not use it as an identity key.
+- `owner`: required relation to one `players` record; not player-editable after creation.
+- `display_name`: bounded public-facing label; never use as an identity key.
 - `avatar_key`: optional key for an allowlisted asset, not an arbitrary filesystem path or remote URL.
-- `created` / `updated`: server-managed timestamps.
+- Server-managed `created` / `updated` timestamps.
 
-Avoid storing precise location histories or unnecessary personal information in a profile.
+Disable public listing of player records. Keep administrator accounts separate from ordinary players; do not promote a player by accepting a client-submitted role field. Keep purchase entitlements, organizer privileges, and trusted score totals out of client-editable player fields.
 
 ## API-rule starting point
 
-PocketBase API rules control which records a request may access. For a private `player_profiles` collection, use owner-scoped list/view rules equivalent to:
+For a private `player_profiles` collection, owner-scoped list/view rules should restrict records to the authenticated owner, for example:
 
 ```text
 owner = @request.auth.id
 ```
 
-For create/update, enforce both of these invariants:
+Treat that as a starting point, not a universal copy/paste migration. Verify the exact rule syntax and create/update semantics against the PocketBase version and actual collection schema. For create/update, test that a player cannot set or change `owner` to another player.
 
-1. The authenticated player is the profile owner.
-2. The request cannot set or change `owner` to another player.
+Do not allow player clients to create or change authoritative purchase, kit-entitlement, organizer-role, moderation, or trusted-score records. Those writes must use a server-controlled flow that validates the underlying authorization or event.
 
-The exact create/update expression depends on the pinned PocketBase version and how the client submits partial updates. Test both omitted and tampered `owner` values. Do not copy a rule into production without verifying its behavior against the actual version and collection schema.
+## API access tests
 
-For collections that represent purchases, kit entitlements, trusted scores, moderation actions, or organizer roles, **do not allow the player client to create or change authoritative records**. Write them only through a server-controlled flow that validates the purchase, organizer authority, or score submission.
+Requires Node.js 20+, a disposable PocketBase instance, and two synthetic accounts with one profile each. **Do not run this against production accounts or production data.**
 
-## Access-control checklist
+The default names are `players` and `player_profiles`; override the collection names with environment variables if your test instance uses different names.
 
-- Unauthenticated requests cannot list or read private profiles.
-- Player A cannot read, update, or delete Player B's profile.
+Set these variables in your local shell or a temporary test-only secret context:
+
+- `PB_TEST_URL`
+- `PB_TEST_PLAYER_A_EMAIL`, `PB_TEST_PLAYER_A_PASSWORD`, `PB_TEST_PLAYER_A_ID`, `PB_TEST_PROFILE_A_ID`
+- `PB_TEST_PLAYER_B_EMAIL`, `PB_TEST_PLAYER_B_PASSWORD`, `PB_TEST_PLAYER_B_ID`, `PB_TEST_PROFILE_B_ID`
+- Optional: `PB_TEST_AUTH_COLLECTION`, `PB_TEST_PROFILE_COLLECTION`
+
+Run from this directory:
+
+```sh
+npm run test:access
+```
+
+The suite verifies that unauthenticated profile listing is denied, each player can read their own profile, and Player A cannot read Player B's profile. It fails immediately if required configuration is missing; it does not silently report a skipped security test.
+
+### Additional API cases before production
+
 - Player A cannot create a profile owned by Player B.
 - Player A cannot change their own profile's owner relation.
-- Client requests cannot grant themselves a kit, paid entitlement, organizer role, or trusted score.
+- Client requests cannot grant a kit, paid entitlement, organizer role, or trusted score.
 - Unknown fields and unexpected payload types fail validation.
-- Rate-limited auth and recovery endpoints behave as configured.
-- Rules are tested through the API using separate synthetic accounts, not only by clicking around in the admin UI.
-
-## Verification procedure
-
-1. Pin and record the exact PocketBase release.
-2. Create two disposable test accounts, Player A and Player B, and one profile for each.
-3. Use authenticated API requests to exercise every checklist case above.
-4. Repeat with no auth token, an expired token, a malformed record ID, a forged owner ID, and an unexpected field.
-5. Save sanitized test results and the PocketBase version with the recipe. Never commit tokens, live records, or database files.
-6. Re-run the tests after changing collection fields, API rules, PocketBase versions, or reverse-proxy configuration.
+- Expired tokens and malformed record IDs fail safely.
+- Repeat the suite after changing rules, schema, PocketBase version, or proxy configuration.
 
 ## Operational boundaries
 
 - Keep the admin UI off the public internet; use a private management path.
 - Use HTTPS for player traffic and restrict reverse-proxy exposure to intended public endpoints.
-- Back up the database and uploaded files together, and rehearse restoration separately from an upgrade.
-- A client-side check is not authorization. A successful response from a player-facing endpoint does not prove that a paid entitlement or trusted score is valid.
-- This pattern does not establish production readiness until the version-specific rules and API tests pass in the target environment.
+- Back up the database and uploaded files together, then rehearse restoration on a clean host.
+- A client-side check is not authorization. A successful player-facing response does not prove a purchase or trusted score is valid.
+- This recipe does not certify production readiness; retain the PocketBase version and sanitized test results with the release evidence.

@@ -1,0 +1,30 @@
+name: Recipe checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pocketbase-recipe-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  access-harness-syntax:
+    name: Access harness syntax (Node.js 20)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate test harness syntax
+        run: node --check examples/01-player-auth/tests/player-profile-access.test.mjs
+      - name: Validate recipe package manifest
+        run: node -e "JSON.parse(require('node:fs').readFileSync('examples/01-player-auth/package.json', 'utf8'))"
