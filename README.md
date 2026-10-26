@@ -23,6 +23,10 @@ A **PocketBase cookbook** for game backends: player authentication, kit unlocks,
 
 **Quality bar:** Every pattern should name its trust boundaries, show how to test both allowed and denied requests, state its PocketBase version assumptions, and document recovery limitations. A test harness is not proof that the target server is configured correctly until it has been run against that server.
 
+## Cross-service integration
+
+The companion [Stripe Cookbook](https://github.com/ZQM-Labs/stripe-cookbook) handles verified payment events and durable fulfillment. The shared design boundary for paid access is documented in [Entitlement Contract v1](docs/entitlement-contract-v1.md). It specifies identity mapping, server-only entitlement writes, idempotent projection, revocation/reconciliation requirements, and the integration tests still needed. This is a design contract, **not** a deployed Stripe-to-PocketBase bridge.
+
 ## Who this is for
 
 Game developers operating a self-hosted PocketBase backend for players, kits, and leaderboards.
