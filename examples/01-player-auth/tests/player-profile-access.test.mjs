@@ -13,8 +13,15 @@ if (baseUrl) {
   if (!["http:", "https:"].includes(target.protocol)) {
     throw new Error("PB_TEST_URL must use HTTP or HTTPS.");
   }
+  if (target.username || target.password) {
+    throw new Error("PB_TEST_URL must not embed credentials; provide test-account credentials through PB_TEST_* variables.");
+  }
   const localHosts = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
-  if (!localHosts.has(target.hostname) && process.env.PB_TEST_ALLOW_REMOTE !== "1") {
+  const isLocalTarget = localHosts.has(target.hostname);
+  if (!isLocalTarget && target.protocol !== "https:") {
+    throw new Error("Remote PocketBase test targets must use HTTPS to protect synthetic account credentials in transit.");
+  }
+  if (!isLocalTarget && process.env.PB_TEST_ALLOW_REMOTE !== "1") {
     throw new Error(
       "Refusing to target a non-local PocketBase host by default. Use a disposable test instance and set PB_TEST_ALLOW_REMOTE=1 explicitly to opt in."
     );
