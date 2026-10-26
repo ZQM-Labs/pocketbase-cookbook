@@ -11,51 +11,77 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A **PocketBase cookbook** for game backends: player auth, kit unlocks, leaderboards, and admin. Patterns are written for the Labs slice of PocketBase — the game backend plane behind web location games — not as a generic PocketBase manual. It is intended for game developers running a small self-hosted backend for players. Validate each pattern against your own backend, PocketBase version, and operating environment before adopting it. Examples use synthetic players and placeholder credentials only, never real player data.
+A **PocketBase cookbook** for game backends: player authentication, kit unlocks, leaderboards, and administration. Patterns focus on the ZQM Labs game-backend use case rather than attempting to duplicate the general PocketBase manual. Examples use synthetic accounts and placeholder values only. Never commit real player records, tokens, credentials, or production database files.
 
 ## Repository role and status
 
-**Status:** Active, public — seeding. Pattern passes land in follow-up work; the table below lists what is planned, not what is already written.
+**Status:** Active, public — first security-focused recipe available. The pattern list distinguishes written guidance from planned examples.
 
-**What this repository is:** PocketBase patterns for game backends — auth, unlocks, leaderboards, and admin.
+**What this repository is:** Practical backend patterns for game auth, entitlement checks, leaderboard integrity, and safe administration.
 
-**What it contributes:** Part of the ZQM Labs game-development portfolio, and a sibling to the ZQM Computing geospatial cookbook series.
+**What it contributes:** Part of the ZQM Labs game-development portfolio. It complements ZQM Computing's geospatial cookbook series by focusing on game identity, authorization, and backend operations.
 
-**Standing:** This repository is maintained independently. Automated checks cover only the paths and environments configured in its workflows; they do not establish production readiness or operational certification.
+**Quality bar:** Every pattern should name its trust boundaries, show how to test both allowed and denied requests, state its PocketBase version assumptions, and document recovery limitations. CI or documentation review alone does not establish production readiness.
 
 ## Who this is for
 
-Game developers running a small self-hosted backend for players, kits, and leaderboards.
+Game developers operating a self-hosted PocketBase backend for players, kits, and leaderboards.
 
 ## Prerequisites
 
-- PocketBase (version pinned per pattern at fill time)
+- A PocketBase release pinned and recorded for the application
 - A web game client that talks to the PocketBase API
-- Admin access kept private: localhost or tailnet-only bindings, never a public admin panel with default credentials
+- A private administrative access path; do not expose the admin UI publicly
+- Disposable synthetic accounts for permission tests
 
-## Patterns (planned)
+## Patterns
 
-| # | Example | What it will demonstrate |
-|---|---------|--------------------------|
-| 01 | `01-player-auth` | Player accounts and auth rules with least-privilege collections |
-| 02 | `02-kit-unlock` | Kit records, access codes, and unlock checks for purchased content |
-| 03 | `03-leaderboard` | Per-kit leaderboards with score submission rules |
-| 04 | `04-admin-backups` | Admin-only access, backups, and safe upgrade practice |
+### 01 — Player authentication and private profiles (written)
+
+[Open the player-auth recipe](examples/01-player-auth/). Covers the player/profile data model, owner-scoped access rules, client trust boundaries, cross-account denial tests, and operational limits. The rule guidance must be verified against the exact PocketBase release before use.
+
+### 02 — Kit unlocks (planned)
+
+Separate public catalog metadata from authoritative entitlements. Verify purchases and access on the server; never trust client-supplied kit IDs or unlock flags.
+
+### 03 — Leaderboards (planned)
+
+Validate score submissions, prevent client edits to trusted totals, define tie and replay behavior, and minimize player data in public rankings.
+
+### 04 — Admin and backups (planned)
+
+Private administration, database-plus-upload backup consistency, versioned upgrades, and a rehearsed clean-host restore.
 
 ## Repository layout
 
 ```text
 pocketbase-cookbook/
-├── examples/  # one directory per pattern
+├── examples/
+│   └── 01-player-auth/
+│       └── README.md
 ├── README.md
 └── LICENSE
 ```
 
+## Security principles
+
+- Treat every browser request as attacker-controlled.
+- Derive identity from authenticated server context, not submitted player IDs.
+- Keep admin, entitlement, purchase, moderation, and trusted score writes server-controlled.
+- Test forbidden access across separate synthetic accounts.
+- Keep admin interfaces private and public API exposure minimal.
+- Back up database and uploaded files together; test restoration, not just backup creation.
+- Do not claim version compatibility until the recipe has been tested against that exact version.
+
 ## Roadmap
 
-- First pattern pass: player auth (01), then kit unlock (02)
-- Second pass: leaderboards (03) and admin/backups (04)
+1. Build an executable kit-unlock flow with a server-verified entitlement boundary.
+2. Add API-level tests for the player/profile rules against a pinned PocketBase release.
+3. Add leaderboard submission rules and replay/abuse tests.
+4. Add a documented backup-and-restore rehearsal for a clean host.
 
 ## Contributing
 
-A contributing guide lands with the first pattern pass. Report security issues to <zqmcomputing@gmail.com> — please do not open a public issue for those.
+Contributions should include the target PocketBase version, a clear authorization model, allowed and denied test cases, synthetic data, and known operational limitations. Avoid vague examples that imply a client-side check protects a server resource.
+
+Report security issues to <zqmcomputing@gmail.com> — please do not open a public issue for those.
