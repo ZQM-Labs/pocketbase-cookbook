@@ -43,6 +43,18 @@ test("explicit remote opt-in passes host guard but still requires test credentia
   assert.doesNotMatch(result.stderr, /Refusing to target a non-local PocketBase host/);
 });
 
+test("remote HTTP is refused even with explicit remote opt-in", () => {
+  const result = runWithUrl("http://example.invalid", true);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Remote PocketBase test targets must use HTTPS/);
+});
+
+test("URL-embedded credentials are refused", () => {
+  const result = runWithUrl("http://synthetic-user:synthetic-pass@127.0.0.1:8090", false);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /must not embed credentials/);
+});
+
 test("IPv6 loopback passes the local-host guard and fails closed on missing credentials", () => {
   const result = runWithUrl("http://[::1]:8090", false);
   assert.notEqual(result.status, 0);
