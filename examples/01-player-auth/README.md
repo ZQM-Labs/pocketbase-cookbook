@@ -77,3 +77,8 @@ The API suite verifies that unauthenticated profile listing does not disclose re
 - Back up the database and uploaded files together, then rehearse restoration on a clean host.
 - A client-side check is not authorization. A successful player-facing response does not prove a purchase or trusted score is valid.
 - This recipe does not certify production readiness; retain the PocketBase version and sanitized test results with the release evidence.
+
+
+## Ownership mutation check
+
+The opt-in API harness also attempts to change Player B's profile owner using Player A's token, then verifies the persisted owner and Player B's continued read access. This catches owner reassignment even if the API returns a successful status while filtering protected fields. Run the suite only against a disposable PocketBase instance with synthetic accounts; static CI checks do not establish that a deployed instance's collection rules are correct.
