@@ -59,7 +59,7 @@ Run from this directory:
 npm run test:access
 ```
 
-The suite verifies that unauthenticated profile listing is denied, each player can read their own profile, and Player A cannot read Player B's profile. It fails immediately if required configuration is missing; it does not silently report a skipped security test.
+The API suite verifies that unauthenticated profile listing does not disclose records, each player can read their own profile, and Player A cannot read Player B's profile. The separate `npm run test:config` suite checks the local-host default, remote-host opt-in, and unsupported URL schemes without making network requests. The API suite fails immediately if required configuration is missing; it does not silently report a skipped security test.
 
 ### Additional API cases before production
 
