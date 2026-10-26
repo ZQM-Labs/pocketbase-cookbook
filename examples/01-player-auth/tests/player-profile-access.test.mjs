@@ -197,18 +197,14 @@ test("player A cannot create a profile owned by player B", async () => {
   );
 });
 
-test("player A cannot create a profile while spoofing owner as player B", async () => {
-  const marker = `authz-owner-spoof-${randomUUID()}`;
+test("profile creation without a required owner relation is rejected", async () => {
+  const marker = `authz-missing-owner-${randomUUID()}`;
   const { response, data } = await request(
     `/api/collections/${encodeURIComponent(profiles)}/records`,
     {
       token: tokenA,
       method: "POST",
-      body: {
-        owner: process.env.PB_TEST_PLAYER_B_ID,
-        display_name: marker,
-        avatar_key: "authz-test",
-      },
+      body: { display_name: marker },
     },
   );
 
@@ -219,15 +215,11 @@ test("player A cannot create a profile while spoofing owner as player B", async 
         `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
         { token: tokenA, method: "DELETE" },
       );
-      await request(
-        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
-        { token: tokenB, method: "DELETE" },
-      );
     }
   }
 
   assert.ok(
     response.status !== 200 && response.status !== 201,
-    "profile creation with a client-supplied foreign owner must be denied",
+    "a profile must not be created without its required owner relation",
   );
 });
