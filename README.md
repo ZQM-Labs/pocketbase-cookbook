@@ -88,6 +88,22 @@ pocketbase-cookbook/
 3. Add leaderboard submission rules and replay/abuse tests.
 4. Add a documented backup-and-restore rehearsal for a clean host.
 
+## How this cookbook connects to the ZQM Labs stack
+
+PocketBase owns **player identity and server-enforced access rules** in the reference architecture. It must not infer payment truth from browser state.
+
+| Upstream/downstream concern | Related cookbook | Boundary |
+|---|---|---|
+| Client behavior that calls protected APIs | [Godot Cookbook](https://github.com/ZQM-Labs/godot-cookbook) | The client may present credentials and request data; it must not choose another user's trusted identity or grant itself access. |
+| Regression coverage for player flows | [Playwright Cookbook](https://github.com/ZQM-Labs/playwright-cookbook) | Browser tests validate user-visible behavior; API authorization tests remain necessary for direct requests and cross-account denial. |
+| Payment verification and purchase events | [Stripe Cookbook](https://github.com/ZQM-Labs/stripe-cookbook) | Stripe webhook verification and durable order fulfillment are authoritative for payment. PocketBase access should depend on a server-controlled entitlement record, not a redirect or client flag. |
+
+### Integration contract
+
+Before wiring a paid entitlement into PocketBase, specify a stable internal player/customer mapping, product-to-entitlement mapping, server-only write path, idempotency strategy, revocation/refund behavior, and reconciliation procedure. Do not accept owner IDs or entitlement flags as trusted merely because they came from the game client.
+
+The cookbooks are **separate examples, not a turnkey integration**. The current profile harness does not prove deployed collection rules, and the Stripe adapter is not production-certified. Connect them only through an explicitly documented API/data contract and validate against disposable instances with synthetic users and orders.
+
 ## Contributing
 
 Contributions should include the target PocketBase version, a clear authorization model, allowed and denied test cases, synthetic data, and known operational limitations. Avoid vague examples that imply a client-side check protects a server resource.
