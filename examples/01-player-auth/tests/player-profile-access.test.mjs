@@ -2,6 +2,23 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 const baseUrl = process.env.PB_TEST_URL?.replace(/\/+$/, "");
+if (baseUrl) {
+  let target;
+  try {
+    target = new URL(baseUrl);
+  } catch {
+    throw new Error("PB_TEST_URL must be a valid absolute URL.");
+  }
+  if (!["http:", "https:"].includes(target.protocol)) {
+    throw new Error("PB_TEST_URL must use HTTP or HTTPS.");
+  }
+  const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
+  if (!localHosts.has(target.hostname) && process.env.PB_TEST_ALLOW_REMOTE !== "1") {
+    throw new Error(
+      "Refusing to target a non-local PocketBase host by default. Use a disposable test instance and set PB_TEST_ALLOW_REMOTE=1 explicitly to opt in."
+    );
+  }
+}
 const collection = process.env.PB_TEST_AUTH_COLLECTION || "players";
 const profiles = process.env.PB_TEST_PROFILE_COLLECTION || "player_profiles";
 const required = [
