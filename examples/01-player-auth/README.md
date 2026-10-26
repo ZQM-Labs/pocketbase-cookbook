@@ -33,12 +33,25 @@ Requires Node.js 20+, a disposable PocketBase instance, and two synthetic accoun
 
 The default names are `players` and `player_profiles`; override the collection names with environment variables if your test instance uses different names.
 
+Start with the committed template, then fill in only synthetic test-account values:
+
+```sh
+cp .env.test.example .env.test
+# Edit .env.test with credentials and IDs for the disposable test instance.
+set -a
+. ./.env.test
+set +a
+npm run test:access
+```
+
+Do not commit `.env.test`; keep it local and delete it after testing. The default URL points to a local PocketBase instance. The harness refuses non-local hosts unless you explicitly set `PB_TEST_ALLOW_REMOTE=1` for a disposable remote test instance. Never use production accounts or data.
+
 Set these variables in your local shell or a temporary test-only secret context:
 
 - `PB_TEST_URL`
 - `PB_TEST_PLAYER_A_EMAIL`, `PB_TEST_PLAYER_A_PASSWORD`, `PB_TEST_PLAYER_A_ID`, `PB_TEST_PROFILE_A_ID`
 - `PB_TEST_PLAYER_B_EMAIL`, `PB_TEST_PLAYER_B_PASSWORD`, `PB_TEST_PLAYER_B_ID`, `PB_TEST_PROFILE_B_ID`
-- Optional: `PB_TEST_AUTH_COLLECTION`, `PB_TEST_PROFILE_COLLECTION`
+- Optional: `PB_TEST_AUTH_COLLECTION`, `PB_TEST_PROFILE_COLLECTION`, `PB_TEST_ALLOW_REMOTE=1` (remote disposable instance only)
 
 Run from this directory:
 
