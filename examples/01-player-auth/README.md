@@ -59,7 +59,7 @@ Run from this directory:
 npm run test:access
 ```
 
-The API suite verifies that unauthenticated profile listing does not disclose records, each player can read their own profile, Player A cannot read Player B's profile, and Player A cannot create a profile owned by Player B, omit the required owner relation, or reassign a profile to Player B. The creation tests use unique synthetic markers and attempt best-effort cleanup if an authorization rule is unexpectedly permissive; run them only on a disposable test instance. The separate `npm run test:config` suite checks the local-host default, remote-host opt-in, and unsupported URL schemes without making network requests. The API suite fails immediately if required configuration is missing; it does not silently report a skipped security test.
+The API suite verifies that unauthenticated profile listing and direct reads by known record ID do not disclose records, each player can read their own profile, Player A cannot read Player B's profile, and Player A cannot create a profile owned by Player B, omit the required owner relation, or reassign a profile to Player B. The creation tests use unique synthetic markers and attempt best-effort cleanup if an authorization rule is unexpectedly permissive; run them only on a disposable test instance. The separate `npm run test:config` suite checks the local-host default, remote-host opt-in, and unsupported URL schemes without making network requests. The API suite fails immediately if required configuration is missing; it does not silently report a skipped security test.
 
 ### Additional API cases before production
 
