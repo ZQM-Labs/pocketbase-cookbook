@@ -55,9 +55,27 @@ test.before(async () => {
   tokenB = await authenticate(process.env.PB_TEST_PLAYER_B_EMAIL, process.env.PB_TEST_PLAYER_B_PASSWORD);
 });
 
-test("unauthenticated clients cannot list private profiles", async () => {
-  const { response } = await request(`/api/collections/${encodeURIComponent(profiles)}/records`);
-  assert.notEqual(response.status, 200, "private profile list must not be public");
+test("unauthenticated clients cannot read private profile records", async () => {
+  const { response, data } = await request(`/api/collections/${encodeURIComponent(profiles)}/records`);
+  // PocketBase may return 200 with an empty filtered result when a list rule excludes
+  // unauthenticated users. Status alone is not enough to establish a data leak.
+  assert.ok(
+    !response.ok || (Array.isArray(data?.items) && data.items.length === 0),
+    "unauthenticated list request must not disclose profile records"
+  );
+});
+
+test("player A's profile list contains no other owner's records", async () => {
+  const { response, data } = await request(
+    `/api/collections/${encodeURIComponent(profiles)}/records`,
+    { token: tokenA }
+  );
+  assert.equal(response.status, 200);
+  assert.ok(Array.isArray(data?.items), "PocketBase list response must contain items");
+  assert.ok(
+    data.items.every((profile) => profile.owner === process.env.PB_TEST_PLAYER_A_ID),
+    "player A must not receive another player's profile in a list response"
+  );
 });
 
 test("player A can read their own profile", async () => {
