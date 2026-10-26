@@ -140,3 +140,21 @@ test("player A cannot reassign player B's profile ownership", async () => {
     "player A must not transfer ownership of player B's profile",
   );
 });
+
+
+test("player A cannot transfer their own profile to player B", async () => {
+  const profilePath = `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(process.env.PB_TEST_PROFILE_A_ID)}`;
+  await request(profilePath, {
+    token: tokenA,
+    method: "PATCH",
+    body: { owner: process.env.PB_TEST_PLAYER_B_ID },
+  });
+
+  const { response, data } = await request(profilePath, { token: tokenA });
+  assert.equal(response.status, 200, "player A must retain access to their own profile");
+  assert.equal(
+    data?.owner,
+    process.env.PB_TEST_PLAYER_A_ID,
+    "player A must not change the owner relation to player B",
+  );
+});
