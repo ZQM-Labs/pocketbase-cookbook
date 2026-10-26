@@ -12,7 +12,7 @@ if (baseUrl) {
   if (!["http:", "https:"].includes(target.protocol)) {
     throw new Error("PB_TEST_URL must use HTTP or HTTPS.");
   }
-  const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
+  const localHosts = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
   if (!localHosts.has(target.hostname) && process.env.PB_TEST_ALLOW_REMOTE !== "1") {
     throw new Error(
       "Refusing to target a non-local PocketBase host by default. Use a disposable test instance and set PB_TEST_ALLOW_REMOTE=1 explicitly to opt in."

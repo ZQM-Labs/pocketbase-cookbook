@@ -42,3 +42,10 @@ test("explicit remote opt-in passes host guard but still requires test credentia
   assert.match(result.stderr, /Access tests require a disposable PocketBase instance/);
   assert.doesNotMatch(result.stderr, /Refusing to target a non-local PocketBase host/);
 });
+
+test("IPv6 loopback passes the local-host guard and fails closed on missing credentials", () => {
+  const result = runWithUrl("http://[::1]:8090", false);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Access tests require a disposable PocketBase instance/);
+  assert.doesNotMatch(result.stderr, /Refusing to target a non-local PocketBase host/);
+});
