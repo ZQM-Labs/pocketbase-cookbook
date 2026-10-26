@@ -59,6 +59,7 @@ pocketbase-cookbook/
 ├── .github/workflows/recipe-checks.yml
 ├── examples/
 │   └── 01-player-auth/
+│       ├── .env.test.example
 │       ├── tests/
 │       │   └── player-profile-access.test.mjs
 │       ├── package.json
@@ -76,6 +77,7 @@ pocketbase-cookbook/
 - Keep admin interfaces private and public API exposure minimal.
 - Back up database and uploaded files together; test restoration, not just backup creation.
 - Do not claim version compatibility until the recipe has been tested against that exact version.
+- The opt-in API harness refuses remote hosts by default; remote disposable instances require explicit opt-in.
 - Never run destructive or mutation-focused authorization tests against production accounts.
 
 ## Roadmap
