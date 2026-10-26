@@ -15,7 +15,7 @@ A **PocketBase cookbook** for game backends: player authentication, kit unlocks,
 
 ## Repository role and status
 
-**Status:** Active, public — player-auth guidance, an opt-in API access-test harness, and CI syntax checks. CI validates the harness syntax only; it does not execute API authorization tests against a live PocketBase instance.
+**Status:** Active, public — player-auth guidance, an opt-in API access-test harness, and CI syntax checks. CI validates the harness syntax and runs local, network-free tests for the target safety guard; it does not execute API authorization tests against a live PocketBase instance.
 
 **What this repository is:** Practical backend patterns for game auth, entitlement checks, leaderboard integrity, and safe administration.
 
@@ -59,7 +59,9 @@ pocketbase-cookbook/
 ├── .github/workflows/recipe-checks.yml
 ├── examples/
 │   └── 01-player-auth/
+│       ├── .env.test.example
 │       ├── tests/
+│       │   ├── config-guard.test.mjs
 │       │   └── player-profile-access.test.mjs
 │       ├── package.json
 │       └── README.md
@@ -76,6 +78,7 @@ pocketbase-cookbook/
 - Keep admin interfaces private and public API exposure minimal.
 - Back up database and uploaded files together; test restoration, not just backup creation.
 - Do not claim version compatibility until the recipe has been tested against that exact version.
+- The opt-in API harness refuses remote hosts by default; remote disposable instances require explicit opt-in.
 - Never run destructive or mutation-focused authorization tests against production accounts.
 
 ## Roadmap
