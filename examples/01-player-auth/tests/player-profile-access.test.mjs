@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 
 const baseUrl = process.env.PB_TEST_URL?.replace(/\/+$/, "");
 if (baseUrl) {
@@ -156,5 +157,69 @@ test("player A cannot transfer their own profile to player B", async () => {
     data?.owner,
     process.env.PB_TEST_PLAYER_A_ID,
     "player A must not change the owner relation to player B",
+  );
+});
+
+
+test("player A cannot create a profile owned by player B", async () => {
+  const marker = `authz-create-${randomUUID()}`;
+  const { response, data } = await request(
+    `/api/collections/${encodeURIComponent(profiles)}/records`,
+    {
+      token: tokenA,
+      method: "POST",
+      body: {
+        owner: process.env.PB_TEST_PLAYER_B_ID,
+        display_name: marker,
+      },
+    },
+  );
+
+  // A successful create is a security failure. Because this test targets a
+  // disposable instance, attempt best-effort cleanup if the rule is misconfigured.
+  if (response.status === 200 || response.status === 201) {
+    const createdId = data?.id;
+    if (typeof createdId === "string") {
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenA, method: "DELETE" },
+      );
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenB, method: "DELETE" },
+      );
+    }
+  }
+
+  assert.ok(
+    response.status !== 200 && response.status !== 201,
+    "player A must not create a profile with player B as owner",
+  );
+});
+
+test("profile creation without a required owner relation is rejected", async () => {
+  const marker = `authz-missing-owner-${randomUUID()}`;
+  const { response, data } = await request(
+    `/api/collections/${encodeURIComponent(profiles)}/records`,
+    {
+      token: tokenA,
+      method: "POST",
+      body: { display_name: marker },
+    },
+  );
+
+  if (response.status === 200 || response.status === 201) {
+    const createdId = data?.id;
+    if (typeof createdId === "string") {
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenA, method: "DELETE" },
+      );
+    }
+  }
+
+  assert.ok(
+    response.status !== 200 && response.status !== 201,
+    "a profile must not be created without its required owner relation",
   );
 });
