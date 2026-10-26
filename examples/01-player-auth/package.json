@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:access": "node --test tests/player-profile-access.test.mjs"
+    "test:access": "node --test tests/player-profile-access.test.mjs",
+    "test:config": "node --test tests/config-guard.test.mjs"
   },
   "engines": {
     "node": ">=20"
