@@ -15,13 +15,13 @@ A **PocketBase cookbook** for game backends: player authentication, kit unlocks,
 
 ## Repository role and status
 
-**Status:** Active, public — first security-focused recipe available. The pattern list distinguishes written guidance from planned examples.
+**Status:** Active, public — player-auth guidance plus an opt-in API access-test harness.
 
 **What this repository is:** Practical backend patterns for game auth, entitlement checks, leaderboard integrity, and safe administration.
 
 **What it contributes:** Part of the ZQM Labs game-development portfolio. It complements ZQM Computing's geospatial cookbook series by focusing on game identity, authorization, and backend operations.
 
-**Quality bar:** Every pattern should name its trust boundaries, show how to test both allowed and denied requests, state its PocketBase version assumptions, and document recovery limitations. CI or documentation review alone does not establish production readiness.
+**Quality bar:** Every pattern should name its trust boundaries, show how to test both allowed and denied requests, state its PocketBase version assumptions, and document recovery limitations. A test harness is not proof that the target server is configured correctly until it has been run against that server.
 
 ## Who this is for
 
@@ -32,13 +32,13 @@ Game developers operating a self-hosted PocketBase backend for players, kits, an
 - A PocketBase release pinned and recorded for the application
 - A web game client that talks to the PocketBase API
 - A private administrative access path; do not expose the admin UI publicly
-- Disposable synthetic accounts for permission tests
+- Two disposable synthetic player accounts and their profiles for the access-test harness
 
 ## Patterns
 
-### 01 — Player authentication and private profiles (written)
+### 01 — Player authentication and private profiles (recipe + API harness)
 
-[Open the player-auth recipe](examples/01-player-auth/). Covers the player/profile data model, owner-scoped access rules, client trust boundaries, cross-account denial tests, and operational limits. The rule guidance must be verified against the exact PocketBase release before use.
+[Open the player-auth recipe](examples/01-player-auth/). Covers the player/profile data model, owner-scoped access rules, client trust boundaries, cross-account denial tests, and operational limits. The optional Node.js test harness checks unauthenticated listing, own-profile access, and cross-player profile denial against a running test instance. Verify rule syntax against the exact PocketBase release before use.
 
 ### 02 — Kit unlocks (planned)
 
@@ -58,6 +58,9 @@ Private administration, database-plus-upload backup consistency, versioned upgra
 pocketbase-cookbook/
 ├── examples/
 │   └── 01-player-auth/
+│       ├── tests/
+│       │   └── player-profile-access.test.mjs
+│       ├── package.json
 │       └── README.md
 ├── README.md
 └── LICENSE
@@ -72,11 +75,12 @@ pocketbase-cookbook/
 - Keep admin interfaces private and public API exposure minimal.
 - Back up database and uploaded files together; test restoration, not just backup creation.
 - Do not claim version compatibility until the recipe has been tested against that exact version.
+- Never run destructive or mutation-focused authorization tests against production accounts.
 
 ## Roadmap
 
-1. Build an executable kit-unlock flow with a server-verified entitlement boundary.
-2. Add API-level tests for the player/profile rules against a pinned PocketBase release.
+1. Add owner-reassignment and create-profile denial tests using a disposable instance.
+2. Build an executable kit-unlock flow with a server-verified entitlement boundary.
 3. Add leaderboard submission rules and replay/abuse tests.
 4. Add a documented backup-and-restore rehearsal for a clean host.
 
