@@ -120,3 +120,23 @@ test("player B can read their own profile", async () => {
   assert.equal(response.status, 200);
   assert.equal(data?.owner, process.env.PB_TEST_PLAYER_B_ID);
 });
+
+
+test("player A cannot reassign player B's profile ownership", async () => {
+  const profilePath = `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(process.env.PB_TEST_PROFILE_B_ID)}`;
+  await request(profilePath, {
+    token: tokenA,
+    method: "PATCH",
+    body: { owner: process.env.PB_TEST_PLAYER_A_ID },
+  });
+
+  // A successful HTTP status alone is not proof that the protected field changed
+  // (some APIs filter fields); verify the durable owner with the original owner.
+  const { response, data } = await request(profilePath, { token: tokenB });
+  assert.equal(response.status, 200, "player B must retain access to their own profile");
+  assert.equal(
+    data?.owner,
+    process.env.PB_TEST_PLAYER_B_ID,
+    "player A must not transfer ownership of player B's profile",
+  );
+});
