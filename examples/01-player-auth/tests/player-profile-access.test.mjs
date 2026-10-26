@@ -230,3 +230,12 @@ test("profile creation without a required owner relation is rejected", async () 
     "a profile must not be created without its required owner relation",
   );
 });
+
+
+test("unauthenticated clients cannot read a known private profile by ID", async () => {
+  const { response, data } = await request(
+    `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(process.env.PB_TEST_PROFILE_B_ID)}`,
+  );
+  assert.notEqual(response.status, 200, "unauthenticated direct record reads must be denied");
+  assert.notEqual(data?.owner, process.env.PB_TEST_PLAYER_B_ID, "private profile owner data must not be disclosed");
+});
