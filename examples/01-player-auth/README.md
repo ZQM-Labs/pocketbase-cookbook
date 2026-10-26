@@ -82,3 +82,6 @@ The API suite verifies that unauthenticated profile listing does not disclose re
 ## Ownership mutation check
 
 The opt-in API harness also attempts to change Player B's profile owner using Player A's token, then verifies the persisted owner and Player B's continued read access. This catches owner reassignment even if the API returns a successful status while filtering protected fields. Run the suite only against a disposable PocketBase instance with synthetic accounts; static CI checks do not establish that a deployed instance's collection rules are correct.
+
+
+The harness now also attempts to transfer Player A's own profile to Player B, then verifies that Player A remains the persisted owner. Both owner-mutation cases should be run against a disposable instance configured with the intended collection rules; a green static CI job is not a substitute for that runtime check.
