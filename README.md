@@ -15,7 +15,7 @@ A **PocketBase cookbook** for game backends: player authentication, kit unlocks,
 
 ## Repository role and status
 
-**Status:** Active, public — player-auth guidance plus an opt-in API access-test harness.
+**Status:** Active, public — player-auth guidance, an opt-in API access-test harness, and CI syntax checks. CI validates the harness syntax only; it does not execute API authorization tests against a live PocketBase instance.
 
 **What this repository is:** Practical backend patterns for game auth, entitlement checks, leaderboard integrity, and safe administration.
 
@@ -56,6 +56,7 @@ Private administration, database-plus-upload backup consistency, versioned upgra
 
 ```text
 pocketbase-cookbook/
+├── .github/workflows/recipe-checks.yml
 ├── examples/
 │   └── 01-player-auth/
 │       ├── tests/
