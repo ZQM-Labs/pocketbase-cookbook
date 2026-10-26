@@ -28,3 +28,6 @@ jobs:
         run: node --check examples/01-player-auth/tests/player-profile-access.test.mjs
       - name: Validate recipe package manifest
         run: node -e "JSON.parse(require('node:fs').readFileSync('examples/01-player-auth/package.json', 'utf8'))"
+      - name: Run local target-guard tests
+        working-directory: examples/01-player-auth
+        run: npm run test:config
