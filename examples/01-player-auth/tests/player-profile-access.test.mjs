@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 
 const baseUrl = process.env.PB_TEST_URL?.replace(/\/+$/, "");
 if (baseUrl) {
@@ -156,5 +157,77 @@ test("player A cannot transfer their own profile to player B", async () => {
     data?.owner,
     process.env.PB_TEST_PLAYER_A_ID,
     "player A must not change the owner relation to player B",
+  );
+});
+
+
+test("player A cannot create a profile owned by player B", async () => {
+  const marker = `authz-create-${randomUUID()}`;
+  const { response, data } = await request(
+    `/api/collections/${encodeURIComponent(profiles)}/records`,
+    {
+      token: tokenA,
+      method: "POST",
+      body: {
+        owner: process.env.PB_TEST_PLAYER_B_ID,
+        display_name: marker,
+      },
+    },
+  );
+
+  // A successful create is a security failure. Because this test targets a
+  // disposable instance, attempt best-effort cleanup if the rule is misconfigured.
+  if (response.status === 200 || response.status === 201) {
+    const createdId = data?.id;
+    if (typeof createdId === "string") {
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenA, method: "DELETE" },
+      );
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenB, method: "DELETE" },
+      );
+    }
+  }
+
+  assert.ok(
+    response.status !== 200 && response.status !== 201,
+    "player A must not create a profile with player B as owner",
+  );
+});
+
+test("player A cannot create a profile while spoofing owner as player B", async () => {
+  const marker = `authz-owner-spoof-${randomUUID()}`;
+  const { response, data } = await request(
+    `/api/collections/${encodeURIComponent(profiles)}/records`,
+    {
+      token: tokenA,
+      method: "POST",
+      body: {
+        owner: process.env.PB_TEST_PLAYER_B_ID,
+        display_name: marker,
+        avatar_key: "authz-test",
+      },
+    },
+  );
+
+  if (response.status === 200 || response.status === 201) {
+    const createdId = data?.id;
+    if (typeof createdId === "string") {
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenA, method: "DELETE" },
+      );
+      await request(
+        `/api/collections/${encodeURIComponent(profiles)}/records/${encodeURIComponent(createdId)}`,
+        { token: tokenB, method: "DELETE" },
+      );
+    }
+  }
+
+  assert.ok(
+    response.status !== 200 && response.status !== 201,
+    "profile creation with a client-supplied foreign owner must be denied",
   );
 });
