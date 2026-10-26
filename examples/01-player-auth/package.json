@@ -1,0 +1,11 @@
+{
+  "name": "zqm-pocketbase-player-auth-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:access": "node --test tests/player-profile-access.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
