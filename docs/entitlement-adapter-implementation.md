@@ -10,7 +10,7 @@ The current Lantern backend schema is kit/event-scoped and does not define a `pl
 
 Before implementation, record an explicit product decision choosing between (a) the existing kit/order/download model and its separately reviewed admin provisioning process, or (b) a new hosted per-player entitlement model. Only option (b) should proceed with this adapter specification, after identity mapping, PocketBase collection/auth design, and ownership semantics are approved. Do not enable writes or production access as part of this documentation change.
 
-## Security boundary## Security boundary
+## Security boundary
 
 - Stripe's verified webhook and the Stripe-side PostgreSQL transaction remain the payment authority.
 - The adapter is server-to-server only. Player clients must not create, list, view, update, or delete paid-entitlement records.
