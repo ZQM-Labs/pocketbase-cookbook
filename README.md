@@ -25,7 +25,7 @@ A **PocketBase cookbook** for game backends: player authentication, kit unlocks,
 
 ## Cross-service integration
 
-The companion [Stripe Cookbook](https://github.com/ZQM-Labs/stripe-cookbook) handles verified payment events and durable fulfillment. The shared design boundary for paid access is documented in [Entitlement Contract v1](docs/entitlement-contract-v1.md). It specifies identity mapping, server-only entitlement writes, idempotent projection, revocation/reconciliation requirements, and the integration tests still needed. This is a design contract, **not** a deployed Stripe-to-PocketBase bridge.
+The companion [Stripe Cookbook](https://github.com/ZQM-Labs/stripe-cookbook) handles verified payment events and durable fulfillment. The shared design boundary for paid access is documented in [Entitlement Contract v1](docs/entitlement-contract-v1.md), with an actionable [PocketBase entitlement adapter acceptance contract](docs/entitlement-adapter-implementation.md). These documents specify identity mapping, server-only entitlement writes, idempotent monotonic projection, access-rule tests, failure recovery, and reconciliation requirements. They are design/acceptance contracts, **not** a deployed Stripe-to-PocketBase bridge.
 
 ## Who this is for
 
@@ -62,7 +62,8 @@ Private administration, database-plus-upload backup consistency, versioned upgra
 pocketbase-cookbook/
 ├── .github/workflows/recipe-checks.yml
 ├── docs/
-│   └── entitlement-contract-v1.md
+│   ├── entitlement-contract-v1.md
+│   └── entitlement-adapter-implementation.md
 ├── examples/
 │   └── 01-player-auth/
 │       ├── .env.test.example
