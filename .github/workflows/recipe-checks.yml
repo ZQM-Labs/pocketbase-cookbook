@@ -31,3 +31,10 @@ jobs:
       - name: Run local target-guard tests
         working-directory: examples/01-player-auth
         run: npm run test:config
+      - name: Validate entitlement projector client syntax
+        run: node --check examples/02-entitlement-projector/entitlement-projector-client.cjs
+      - name: Validate entitlement projector package manifest
+        run: node -e "JSON.parse(require('node:fs').readFileSync('examples/02-entitlement-projector/package.json', 'utf8'))"
+      - name: Run entitlement projector transport tests
+        working-directory: examples/02-entitlement-projector
+        run: npm test
