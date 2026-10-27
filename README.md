@@ -61,6 +61,8 @@ Private administration, database-plus-upload backup consistency, versioned upgra
 ```text
 pocketbase-cookbook/
 ├── .github/workflows/recipe-checks.yml
+├── docs/
+│   └── entitlement-contract-v1.md
 ├── examples/
 │   └── 01-player-auth/
 │       ├── .env.test.example
@@ -87,8 +89,8 @@ pocketbase-cookbook/
 
 ## Roadmap
 
-1. Add owner-reassignment and create-profile denial tests using a disposable instance.
-2. Build an executable kit-unlock flow with a server-verified entitlement boundary.
+1. Add an opt-in, disposable-instance integration suite for entitlement collection rules, including denied client grants, cross-player reads/writes, and revocation behavior; do not point it at production.
+2. Build an executable kit-unlock flow using a server-verified entitlement boundary and the versioned [Entitlement Contract v1](docs/entitlement-contract-v1.md).
 3. Add leaderboard submission rules and replay/abuse tests.
 4. Add a documented backup-and-restore rehearsal for a clean host.
 
