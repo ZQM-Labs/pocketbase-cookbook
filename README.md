@@ -15,7 +15,7 @@ A **PocketBase cookbook** for game backends: player authentication, kit unlocks,
 
 ## Repository role and status
 
-**Status:** Active, public — player-auth guidance, an opt-in API access-test harness, and CI syntax checks. CI validates the harness syntax and runs local, network-free tests for the target safety guard; it does not execute API authorization tests against a live PocketBase instance.
+**Status:** Active, public — player-auth guidance, an opt-in API access-test harness, a server-side entitlement-projector transport client, and network-free CI tests. CI validates syntax and client contracts; it does not execute API authorization tests against a live PocketBase instance or prove the separate trusted projector endpoint exists.
 
 **What this repository is:** Practical backend patterns for game auth, entitlement checks, leaderboard integrity, and safe administration.
 
@@ -44,15 +44,19 @@ Game developers operating a self-hosted PocketBase backend for players, kits, an
 
 [Open the player-auth recipe](examples/01-player-auth/). Covers the player/profile data model, owner-scoped access rules, client trust boundaries, cross-account denial tests, and operational limits. The optional Node.js test harness checks unauthenticated listing, own-profile access, and cross-player profile denial against a running test instance. Verify rule syntax against the exact PocketBase release before use.
 
-### 02 — Kit unlocks (planned)
+### 02 — Entitlement projector transport client (reference client; trusted endpoint not implemented)
+
+[Open the projector client recipe](examples/02-entitlement-projector/). Provides a dependency-free server-side HTTP client with an allowlisted payload, HTTPS enforcement, timeout, stable idempotency header, and response-version validation. It does not implement the PocketBase endpoint or atomic authorization logic; do not treat it as a complete or production-ready bridge.
+
+### 03 — Kit unlocks (planned)
 
 Separate public catalog metadata from authoritative entitlements. Verify purchases and access on the server; never trust client-supplied kit IDs or unlock flags.
 
-### 03 — Leaderboards (planned)
+### 04 — Leaderboards (planned)
 
 Validate score submissions, prevent client edits to trusted totals, define tie and replay behavior, and minimize player data in public rankings.
 
-### 04 — Admin and backups (planned)
+### 05 — Admin and backups (planned)
 
 Private administration, database-plus-upload backup consistency, versioned upgrades, and a rehearsed clean-host restore.
 
