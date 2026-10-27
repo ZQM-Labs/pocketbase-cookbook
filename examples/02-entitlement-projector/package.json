@@ -1,0 +1,10 @@
+{
+  "name": "zqm-pocketbase-entitlement-projector-client",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
