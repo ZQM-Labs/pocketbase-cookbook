@@ -69,11 +69,17 @@ pocketbase-cookbook/
 │   ├── entitlement-contract-v1.md
 │   └── entitlement-adapter-implementation.md
 ├── examples/
-│   └── 01-player-auth/
-│       ├── .env.test.example
+│   ├── 01-player-auth/
+│   │   ├── .env.test.example
+│   │   ├── tests/
+│   │   │   ├── config-guard.test.mjs
+│   │   │   └── player-profile-access.test.mjs
+│   │   ├── package.json
+│   │   └── README.md
+│   └── 02-entitlement-projector/
 │       ├── tests/
-│       │   ├── config-guard.test.mjs
-│       │   └── player-profile-access.test.mjs
+│       │   └── entitlement-projector-client.test.cjs
+│       ├── entitlement-projector-client.cjs
 │       ├── package.json
 │       └── README.md
 ├── README.md
