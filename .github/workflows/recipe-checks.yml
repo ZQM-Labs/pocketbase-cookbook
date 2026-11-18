@@ -16,7 +16,7 @@ concurrency:
 jobs:
   access-harness-syntax:
     name: Access harness syntax (Node.js 20)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, zqm-linux]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
